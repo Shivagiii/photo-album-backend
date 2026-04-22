@@ -28,7 +28,7 @@ async def upload_photos(
     with file_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    image_url = f"https://api.buildyourown/uploads/{unique_filename}"   
+    image_url = f"https://api.buildyourown.co.in/uploads/{unique_filename}"   
 
     photo_doc={
         "event_id":event_id,
