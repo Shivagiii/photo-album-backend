@@ -32,7 +32,7 @@ async def request_login(payload:RequestLoginSchema):
     })
 
     return {
-        "message":"OTP generated",
+        "message":"OTP generated!",
         "email":email,
         "otp":otp,
         "expires_at":expires_at
