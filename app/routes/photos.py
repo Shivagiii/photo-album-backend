@@ -68,7 +68,7 @@ async def get_photos_by_event(event_id:str):
 @router.delete("/{photo_id}")
 async def delete_photo(photo_id:str,user_id:str):
 
-    photo = db.photos.find_one({"_id":ObjectId(photo_id)})
+    photo =await db.photos.find_one({"_id":ObjectId(photo_id)})
 
     if not photo:
         raise HTTPException(status_code=404,detail="Photo not found")
