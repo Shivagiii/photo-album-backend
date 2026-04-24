@@ -64,3 +64,18 @@ async def get_photos_by_event(event_id:str):
         "photo_list":photos,
         "count":len(photos)
     }
+
+@router.delete("/{photo_id}")
+async def delete_photo(photo_id:str,user_id:str):
+
+    photo = db.photos.find({"_id":ObjectId(photo_id)})
+
+    if not photo:
+        raise HTTPException(status_code=404,detail="Photo not found")
+    
+    if photo["uploaded_by_user_id"] != user_id:
+        raise HTTPException(status_code=403,detail="Not allowed to delete this photo")
+    
+    await db.photos.delete_one({"_id":ObjectId(photo_id)})
+ 
+    return {"message": "Photo deleted successfully"}
