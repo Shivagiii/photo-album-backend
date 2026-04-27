@@ -10,7 +10,7 @@ app= FastAPI()
 origins = [
     "https://buildyourown.co.in",
     "https://www.buildyourown.co.in",
-    "https://organic-bassoon-v5vxw47jqq7fxxqj-3000.app.github.dev/",
+    "https://organic-bassoon-v5vxw47jqq7fxxqj-3000.app.github.dev",
     "http://localhost:3001",
     "http://localhost:3000",
     "http://127.0.0.1:3001",
