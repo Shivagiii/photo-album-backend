@@ -5,6 +5,7 @@ from pathlib import Path
 from app.core.db import db
 import shutil
 import uuid
+from app.services.s3_service import upload_file_to_s3, delete_file_from_s3
 router = APIRouter(prefix="/photos",tags=["photos"])
 
 UPLOAD_DIR=Path("uploads")
@@ -23,18 +24,20 @@ async def upload_photos(
     
     extension = Path(file.filename).suffix
     unique_filename = f"{uuid.uuid4().hex}{extension}"
+    s3_key = f"events/{event_id}/{unique_filename}"
     file_path = UPLOAD_DIR / unique_filename
 
     with file_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    image_url = f"https://api.buildyourown.co.in/uploads/{unique_filename}"   
+    image_url = upload_file_to_s3(file.file,s3_key,file.content_type or "image/jpeg")
 
     photo_doc={
         "event_id":event_id,
         "uploaded_by_user_id":uploaded_by_user_id,
         "uploaded_by_name":uploaded_by_name,
         "image_url":image_url,
+        "s3_key": s3_key,
         "filename":unique_filename,
         "original_filename":file.filename,
         "uploaded_at":datetime.utcnow()
@@ -76,6 +79,9 @@ async def delete_photo(photo_id:str,user_id:str):
     if photo["uploaded_by_user_id"] != user_id:
         raise HTTPException(status_code=403,detail="Not allowed to delete this photo")
     
+    if photo.get("s3_key"):
+        delete_file_from_s3(photo["s3_key"])
+
     await db.photos.delete_one({"_id":ObjectId(photo_id)})
  
     return {"message": "Photo deleted successfully"}
