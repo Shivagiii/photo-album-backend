@@ -20,16 +20,12 @@ async def upload_photos(
 ):
     event = await  db.events.find_one({"_id":ObjectId(event_id)})
     if not event:
-        return HTTPException(status_code=400,detail="Event not found")
+        raise HTTPException(status_code=400,detail="Event not found")
     
     extension = Path(file.filename).suffix
     unique_filename = f"{uuid.uuid4().hex}{extension}"
     s3_key = f"events/{event_id}/{unique_filename}"
-    file_path = UPLOAD_DIR / unique_filename
-
-    with file_path.open("wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
+    file.file.seek(0)
     image_url = upload_file_to_s3(file.file,s3_key,file.content_type or "image/jpeg")
 
     photo_doc={
